@@ -1,3 +1,5 @@
+use sql_exercises;
+
 create table Scientists (
   SSN int,
   Name Char(30) not null,
