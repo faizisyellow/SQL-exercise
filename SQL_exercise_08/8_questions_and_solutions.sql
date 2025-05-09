@@ -9,6 +9,7 @@ WHERE
 
 -- 8.2
 -- Same as the previous query, but include the following information in the results: Physician name, name of procedure, date when the procedure was carried out, name of the patient the procedure was carried out on.
+
 SELECT
 	P.NAME AS Physician,
 	Pr.NAME AS `procedure`,
@@ -38,7 +39,7 @@ WHERE
 	T.Physician = U.Physician 
 	AND T.Treatment = U.Procedures
 	AND U.DateUndergoes > T.CertificationExpires 
-	AND P.EmployeeID = U.Physician
+	AND P.EmployeeID = U.Physician;
 
 
 -- 8.4
@@ -62,6 +63,10 @@ WHERE
 	AND Pr.CODE = T.Treatment 
 	AND P.EmployeeID = T.Physician 
 	AND U.DateUndergoes > T.CertificationExpires;
+    
+    
+    
+    
 
 
 -- 8.5
