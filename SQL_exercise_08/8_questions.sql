@@ -14,14 +14,23 @@
 	
 -- 8.5 Obtain the information for appointments where a patient met with a physician other than his/her primary care physician.
 --  Show the following information: Patient name, physician name, nurse name (if any), start and end time of appointment, examination room, and the name of the patient's primary care physician.
-		-- TODO : Select patient's primary care physician's name 
-        SELECT Patient.Name AS PatientName,Physician.Name AS PhysicianNotPrimaryName,Nurse.Name AS NurseName,Appointment.Start,Appointment.End,Appointment.ExaminationRoom FROM Patient JOIN Appointment ON Patient.SSN=Appointment.Patient AND Patient.PCP !=Appointment.Physician JOIN Physician ON Appointment.Physician=Physician.EmployeeID LEFT JOIN Nurse ON Appointment.PrepNurse=Nurse.EmployeeID;
+        SELECT Patient.Name AS PatientName, Physician.Name AS PhysicianNotPrimaryName,Nurse.Name AS NurseName,Appointment.Start,Appointment.End,Appointment.ExaminationRoom, P.Name FROM Patient JOIN Appointment ON Patient.SSN=Appointment.Patient AND Patient.PCP !=Appointment.Physician JOIN Physician ON Appointment.Physician=Physician.EmployeeID LEFT JOIN Nurse ON Appointment.PrepNurse=Nurse.EmployeeID JOIN Physician P ON Patient.PCP = P.EmployeeID;
 
 -- 8.6 The Patient field in Undergoes is redundant, since we can obtain it from the Stay table. There are no constraints in force to prevent inconsistencies between these two tables. More specifically, the Undergoes table may include a row where the patient ID does not match the one we would obtain from the Stay table through the Undergoes.Stay foreign key. Select all rows from Undergoes that exhibit this inconsistency.
+		SELECT * FROM Undergoes JOIN Stay ON Undergoes.Stay=Stay.StayID AND Undergoes.Patient != Stay.Patient;
+
 -- 8.7 Obtain the names of all the nurses who have ever been on call for room 123.
+		SELECT Nurse.Name FROM Nurse JOIN On_Call ON Nurse.EmployeeID=On_Call.Nurse JOIN Room ON On_Call.BlockCode = Room.BlockCode AND Room.RoomNumber=123;
+        
 -- 8.8 The hospital has several examination rooms where appointments take place. Obtain the number of appointments that have taken place in each examination room.
+		SELECT ExaminationRoom,COUNT(*) AS NumberOfAppointment FROM Appointment GROUP BY ExaminationRoom; 
+
 -- 8.9 Obtain the names of all patients (also include, for each patient, the name of the patient's primary care physician), such that \emph{all} the following are true:
-    -- The patient has been prescribed some medication by his/her primary care physician.
+    -- The patient has been prescribed some medication by his/her primary care physician
     -- The patient has undergone a procedure with a cost larger that $5,000
     -- The patient has had at least two appointment where the nurse who prepped the appointment was a registered nurse.
     -- The patient's primary care physician is not the head of any department.
+	
+    SELECT Patient.Name,Physician.Name FROM Patient JOIN Physician ON Patient.PCP=Physician.EmployeeID JOIN Prescribes ON Patient.SSN = Prescribes.Patient AND Prescribes.Physician = Patient.PCP JOIN Undergoes ON Patient.SSN=Undergoes.Patient AND Undergoes.Procedures=(SELECT Code FROM Procedures WHERE Cost > 5000 AND Undergoes.Procedures=Code) JOIN Appointment ON Patient.SSN=Appointment.Patient AND Appointment.PrepNurse=(SELECT EmployeeID FROM Nurse WHERE Appointment.PrepNurse=EmployeeID AND Registered=TRUE) LEFT JOIN Department ON Patient.PCP=Department.Head IS NULL;
+
+  
